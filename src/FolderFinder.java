@@ -5,14 +5,14 @@ import java.nio.file.attribute.BasicFileAttributes;
 /**
  * Created by elohmar on 8/26/2016.
  */
-public class NCFilesFinder extends SimpleFileVisitor<Path> {
+public class FolderFinder extends SimpleFileVisitor<Path> {
 
-    PathMatcher ncFilesMatcher = FileSystems.getDefault().getPathMatcher("glob:**ncfiles");
+    PathMatcher folderMatcher = FileSystems.getDefault().getPathMatcher("glob:**ncfiles");
     Path result;
 
     @Override
     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-        if (ncFilesMatcher.matches(file)){
+        if (folderMatcher.matches(file)){
             result = file;
             return FileVisitResult.TERMINATE;
         }
