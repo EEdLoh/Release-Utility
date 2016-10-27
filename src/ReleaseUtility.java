@@ -9,10 +9,10 @@ public class ReleaseUtility {
         JFrame frame = new JFrame("Release Assistant");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        frame.add(new FilterEntry());
+        frame.add(new FolderEntry());
 
         frame.pack();
-        frame.setSize(400, 200);
+        frame.setSize(800, 200);
         frame.setVisible(true);
     }
     public static void main(String[] args) { SwingUtilities.invokeLater(() -> createAndShowGUI());
