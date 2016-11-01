@@ -17,6 +17,8 @@ public class FileFinder extends SimpleFileVisitor<Path> {
 
     @Override
     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+        System.out.println(file.toString());
+        System.out.println(fileMatcher.matches(file));
         if (fileMatcher.matches(file)) {
             result.add(file);
             return FileVisitResult.CONTINUE;

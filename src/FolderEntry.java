@@ -128,10 +128,16 @@ public class FolderEntry extends JPanel implements ActionListener {
                 if (!sourceText.getText().equals("") && !destText.getText().equals("")) {
                     Path source = Paths.get(sourceText.getText());
                     Path dest = Paths.get(destText.getText());
+
                     System.out.println("Source:" + source.toString());
                     System.out.println("P/N: " + partNoText.getText());
-                    String matchString = "glob:**" + partNoText.getText() + "**";
+
+                    String matchString = "glob:**" + partNoText.getText() + "[, ]*";
+
+                    System.out.println("Matching: " + matchString);
+
                     fileFinder = new FileFinder(matchString);
+
                     try {
                         Files.walkFileTree(source, fileFinder);
                     } catch (IOException e1) {
@@ -140,6 +146,7 @@ public class FolderEntry extends JPanel implements ActionListener {
                     for (Path path : fileFinder.getResult()) {
                         System.out.println("Moving: " + path.getFileName());
                         Path target = Paths.get(dest.toString() + "\\" + path.getFileName());
+
                         try {
                             Files.move(path, target, REPLACE_EXISTING);
                         } catch (IOException e1) {
