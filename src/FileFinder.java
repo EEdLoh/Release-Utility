@@ -4,15 +4,17 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.HashSet;
 
 /**
- * FileFinder is used to walk a file tree, match file paths to a string, and add them to a HashSet that can be used later.
+ * FileFinder is used to walk a file tree, match file paths to a string, and add them to a HashSet that can be used
+ * later.
+ * <p>
  * Created by elohmar on 8/26/2016.
  */
-public class FileFinder extends SimpleFileVisitor<Path> {
+class FileFinder extends SimpleFileVisitor<Path> {
 
     private PathMatcher fileMatcher;
     private HashSet<Path> result = new HashSet<>();
 
-    public FileFinder(String string) {
+    FileFinder(String string) {
         this.setFileMatcher(string);
     }
 
@@ -34,7 +36,7 @@ public class FileFinder extends SimpleFileVisitor<Path> {
         return FileVisitResult.CONTINUE;
     }
 
-    public HashSet<Path> getResult() {
+    HashSet<Path> getResult() {
         return result;
     }
 

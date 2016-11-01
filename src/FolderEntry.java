@@ -11,18 +11,19 @@ import java.nio.file.Paths;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 /**
- * FolderEntry is the GUI for a page that includes a set of text boxes that will be used to store Paths to the source and destination directories for the movement of files.
+ * FolderEntry is the GUI for a page that includes a set of text boxes that will be used to store Paths to the source
+ * and destination directories for the movement of files.
+ * <p>
  * Created by elohmar on 10/26/2016.
  */
-public class FolderEntry extends JPanel implements ActionListener {
+class FolderEntry extends JPanel implements ActionListener {
 
-    JLabel partNoLabel, sourceLabel, destLabel;
-    JTextField partNoText, sourceText, destText;
-    JButton sourceButton, destButton, moveButton;
-    JFileChooser fc;
-    FileFinder fileFinder;
+    private JLabel partNoLabel, sourceLabel, destLabel;
+    private JTextField partNoText, sourceText, destText;
+    private JButton sourceButton, destButton, moveButton;
+    private JFileChooser fc;
 
-    public FolderEntry() {
+    FolderEntry() {
 
         fc = new JFileChooser();
         fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -119,7 +120,7 @@ public class FolderEntry extends JPanel implements ActionListener {
     public void actionPerformed(ActionEvent e) {
 
         int returnVal = fc.showOpenDialog(FolderEntry.this);
-        if (returnVal == JFileChooser.APPROVE_OPTION){
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
             File file = fc.getSelectedFile();
             if (e.getSource() == sourceButton) {
                 sourceText.setText(file.toString());
@@ -137,7 +138,7 @@ public class FolderEntry extends JPanel implements ActionListener {
 
                     System.out.println("Matching: " + matchString);
 
-                    fileFinder = new FileFinder(matchString);
+                    FileFinder fileFinder = new FileFinder(matchString);
 
                     try {
                         Files.walkFileTree(source, fileFinder);
