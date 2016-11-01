@@ -2,7 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * ReleaseUtility is the class that creates the main page for the Release Utility Application.
+ * ReleaseUtility is the class that defines the JFrame for the app window and calls the appropriate displays.
  * <p>
  * The application is to be used by the Engineers at Linkup International LLC in order to simplify the proper movement
  * and deletion of controlled documents in the computer system.
@@ -17,7 +17,7 @@ public class ReleaseUtility {
     private static void createAndShowGUI() {
         JFrame frame = new JFrame("Release Assistant");
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        Dimension minSize = new Dimension(775, 150);
+        Dimension minSize = new Dimension(775, 200);
         frame.setMinimumSize(minSize);
 
         frame.setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.Y_AXIS));
