@@ -2,7 +2,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 /**
  * FolderEntry is the GUI for a page that includes a set of text boxes that will be used to store Paths to the source
@@ -24,19 +28,19 @@ class FolderEntry extends JPanel implements ActionListener {
 
         //Drawings Released Folder Text Field and Browse Button
         releasedLabel = new JLabel("Drawings Released Directory");
-        releasedText = new JTextField();
+        releasedText = new JTextField(ReleaseUtility.getReleased().toString());
         releasedButton = new JButton("Browse");
         releasedButton.addActionListener(this);
 
         //Drawings Archive Folder Text Field and Browse Button
         archiveLabel = new JLabel("Drawings Archive Directory");
-        archiveText = new JTextField();
+        archiveText = new JTextField(ReleaseUtility.getArchive().toString());
         archiveButton = new JButton("Browse");
         archiveButton.addActionListener(this);
 
         //CNC Folder Text Field and Browse Button
         cncLabel = new JLabel("CNC Directory");
-        cncText = new JTextField();
+        cncText = new JTextField(ReleaseUtility.getCnc().toString());
         cncButton = new JButton("Browse");
         cncButton.addActionListener(this);
 
@@ -118,7 +122,22 @@ class FolderEntry extends JPanel implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == saveButton) {
+            try (BufferedWriter writer = Files.newBufferedWriter(ReleaseUtility.getSaveFile())) {
+                writer.write(releasedText.getText());
+                ReleaseUtility.setReleased(Paths.get(releasedText.getText()));
+                writer.newLine();
 
+                writer.write(archiveText.getText());
+                ReleaseUtility.setArchive(Paths.get(archiveText.getText()));
+                writer.newLine();
+
+                writer.write(cncText.getText());
+                ReleaseUtility.setCnc(Paths.get(cncText.getText()));
+                writer.newLine();
+
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
         } else {
             int returnVal = fc.showOpenDialog(FolderEntry.this);
             if (returnVal == JFileChooser.APPROVE_OPTION) {
