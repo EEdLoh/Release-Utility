@@ -27,8 +27,8 @@ public class ReleaseUtility {
     private static final Path saveFile =
             FileSystemView.getFileSystemView().getHomeDirectory()
                     .toPath().resolve("..\\Documents\\Release Utility Directories.txt").normalize();
-
-    private static Path released, archive, cnc;
+    private static final JFileChooser fc = new JFileChooser();
+    private static Path released, archive, cnc, source;
 
     static Path getSaveFile() {
         return saveFile;
@@ -58,21 +58,34 @@ public class ReleaseUtility {
         ReleaseUtility.cnc = cnc;
     }
 
+    static Path getSource() {
+        return source;
+    }
+
+    static void setSource(Path source) {
+        ReleaseUtility.source = source;
+    }
+
+    static JFileChooser getFc() {
+        return fc;
+    }
+
     private static void createAndShowGUI() {
         JFrame frame = new JFrame("Release Assistant");
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         Dimension minSize = new Dimension(775, 200);
         frame.setMinimumSize(minSize);
 
-        frame.setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.Y_AXIS));
-
-        frame.add(new FolderEntry());
+        frame.add(new MainScreen());
 
         frame.pack();
         frame.setVisible(true);
     }
 
     public static void main(String[] args) {
+
+        fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+
         if (Files.exists(ReleaseUtility.saveFile)) {
             try (BufferedReader reader = newBufferedReader(ReleaseUtility.saveFile)) {
                 released = Paths.get(reader.readLine());

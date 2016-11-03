@@ -1,4 +1,5 @@
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -9,11 +10,12 @@ import java.awt.event.ActionListener;
  * <p>
  * Created by elohmar on 11/1/2016.
  */
-class MainScreen implements ActionListener {
+class MainScreen extends JPanel implements ActionListener {
 
     private JLabel partNoLabel, sourceLabel;
     private JTextField partNoText, sourceText;
-    private JButton sourceButton;
+    private JButton sourceButton, settingsButton;
+    private FolderEntry folderEntry;
 
     MainScreen() {
 
@@ -26,10 +28,24 @@ class MainScreen implements ActionListener {
         sourceText = new JTextField();
         sourceButton = new JButton("Browse");
         sourceButton.addActionListener(this);
+
+        //Settings Button Setup
+        settingsButton = new JButton("Options");
+        settingsButton.addActionListener(this);
+
+        ////// Layout //////
+
+        setLayout(new GridBagLayout());
+        GridBagConstraints gc = new GridBagConstraints();
+
+        add(settingsButton);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-
+        if (e.getSource() == settingsButton) {
+            folderEntry = new FolderEntry("Settings", Dialog.ModalityType.APPLICATION_MODAL);
+            folderEntry.setVisible(true);
+        }
     }
 }

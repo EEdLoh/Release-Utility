@@ -14,17 +14,20 @@ import java.nio.file.Paths;
  * <p>
  * Created by elohmar on 10/26/2016.
  */
-class FolderEntry extends JPanel implements ActionListener {
+class FolderEntry extends JDialog implements ActionListener {
 
     private JLabel releasedLabel, archiveLabel, cncLabel;
     private JTextField releasedText, archiveText, cncText;
     private JButton releasedButton, archiveButton, cncButton, saveButton;
-    private JFileChooser fc;
 
-    FolderEntry() {
+    FolderEntry(String title, Dialog.ModalityType modalityType) {
 
-        fc = new JFileChooser();
-        fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        super.setTitle(title);
+        super.setModalityType(modalityType);
+
+
+        Dimension minSize = new Dimension(775, 200);
+        setMinimumSize(minSize);
 
         //Drawings Released Folder Text Field and Browse Button
         releasedLabel = new JLabel("Drawings Released Directory");
@@ -139,9 +142,9 @@ class FolderEntry extends JPanel implements ActionListener {
                 e1.printStackTrace();
             }
         } else {
-            int returnVal = fc.showOpenDialog(FolderEntry.this);
+            int returnVal = ReleaseUtility.getFc().showOpenDialog(FolderEntry.this);
             if (returnVal == JFileChooser.APPROVE_OPTION) {
-                File file = fc.getSelectedFile();
+                File file = ReleaseUtility.getFc().getSelectedFile();
                 if (e.getSource() == releasedButton) {
                     releasedText.setText(file.toString());
                 } else if (e.getSource() == archiveButton) {
