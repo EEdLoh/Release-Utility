@@ -13,19 +13,17 @@ import java.nio.file.Path;
  */
 class MainScreen extends JPanel implements ActionListener {
 
-    private JLabel partNoLabel, sourceLabel;
     private JTextField partNoText, sourceText;
     private JButton sourceButton, settingsButton;
-    private FolderEntry folderEntry;
 
     MainScreen() {
 
         //Part Number Text Field
-        partNoLabel = new JLabel("Part Number");
+        JLabel partNoLabel = new JLabel("Part Number");
         partNoText = new JTextField();
 
         //Source Folder Text Field with a Browse Button
-        sourceLabel = new JLabel("Source Directory");
+        JLabel sourceLabel = new JLabel("Source Directory");
         sourceText = new JTextField();
         sourceButton = new JButton("Browse");
         sourceButton.addActionListener(this);
@@ -91,7 +89,7 @@ class MainScreen extends JPanel implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == settingsButton) {
-            folderEntry = new FolderEntry("Settings", Dialog.ModalityType.APPLICATION_MODAL);
+            FolderEntry folderEntry = new FolderEntry("Settings", Dialog.ModalityType.APPLICATION_MODAL);
             folderEntry.setVisible(true);
         } else if (e.getSource() == sourceButton) {
             int returnVal = ReleaseUtility.getFc().showOpenDialog(this);

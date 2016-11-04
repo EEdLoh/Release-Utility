@@ -16,7 +16,6 @@ import java.nio.file.Paths;
  */
 class FolderEntry extends JDialog implements ActionListener {
 
-    private JLabel releasedLabel, archiveLabel, cncLabel;
     private JTextField releasedText, archiveText, cncText;
     private JButton releasedButton, archiveButton, cncButton, saveButton;
 
@@ -29,19 +28,19 @@ class FolderEntry extends JDialog implements ActionListener {
         setMinimumSize(minSize);
 
         //Drawings Released Folder Text Field and Browse Button
-        releasedLabel = new JLabel("Drawings Released Directory");
+        JLabel releasedLabel = new JLabel("Drawings Released Directory");
         releasedText = new JTextField(ReleaseUtility.getReleased().toString());
         releasedButton = new JButton("Browse");
         releasedButton.addActionListener(this);
 
         //Drawings Archive Folder Text Field and Browse Button
-        archiveLabel = new JLabel("Drawings Archive Directory");
+        JLabel archiveLabel = new JLabel("Drawings Archive Directory");
         archiveText = new JTextField(ReleaseUtility.getArchive().toString());
         archiveButton = new JButton("Browse");
         archiveButton.addActionListener(this);
 
         //CNC Folder Text Field and Browse Button
-        cncLabel = new JLabel("CNC Directory");
+        JLabel cncLabel = new JLabel("CNC Directory");
         cncText = new JTextField(ReleaseUtility.getCnc().toString());
         cncButton = new JButton("Browse");
         cncButton.addActionListener(this);
