@@ -25,7 +25,6 @@ class FolderEntry extends JDialog implements ActionListener {
         super.setTitle(title);
         super.setModalityType(modalityType);
 
-
         Dimension minSize = new Dimension(775, 200);
         setMinimumSize(minSize);
 

@@ -73,7 +73,7 @@ public class ReleaseUtility {
     private static void createAndShowGUI() {
         JFrame frame = new JFrame("Release Assistant");
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        Dimension minSize = new Dimension(775, 200);
+        Dimension minSize = new Dimension(600, 220);
         frame.setMinimumSize(minSize);
 
         frame.add(new MainScreen());
