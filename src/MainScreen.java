@@ -13,6 +13,7 @@ import java.nio.file.Path;
  */
 class MainScreen extends JPanel implements ActionListener {
 
+    private static JCheckBox clearCNCBox, releaseDrawingBox, archiveDrawingBox;
     private JTextField partNoText, sourceText;
     private JButton sourceButton, settingsButton;
 
@@ -31,6 +32,11 @@ class MainScreen extends JPanel implements ActionListener {
         //Settings Button Setup
         settingsButton = new JButton("Options");
         settingsButton.addActionListener(this);
+
+        //Check Box panel and Check Boxes Setup
+        releaseDrawingBox = new JCheckBox("Release Drawings", true);
+        archiveDrawingBox = new JCheckBox("Archive Drawings", true);
+        clearCNCBox = new JCheckBox("Clear CNC Folder", true);
 
         ////// Layout //////
 
@@ -67,6 +73,21 @@ class MainScreen extends JPanel implements ActionListener {
         gc.gridy = 3;
         gc.fill = GridBagConstraints.HORIZONTAL;
         add(sourceText, gc);
+
+        gc.anchor = GridBagConstraints.LINE_START;
+        gc.gridwidth = 1;
+        gc.gridx = 0;
+        gc.gridy = 4;
+        gc.fill = GridBagConstraints.NONE;
+        add(releaseDrawingBox, gc);
+
+        gc.gridx = 0;
+        gc.gridy = 5;
+        add(archiveDrawingBox, gc);
+
+        gc.gridx = 0;
+        gc.gridy = 6;
+        add(clearCNCBox, gc);
 
         ////// Column 2 //////
         gc.anchor = GridBagConstraints.CENTER;

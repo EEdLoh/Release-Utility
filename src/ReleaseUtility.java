@@ -29,6 +29,7 @@ public class ReleaseUtility {
                     .toPath().resolve("..\\Documents\\Release Utility Directories.txt").normalize();
     private static final JFileChooser fc = new JFileChooser();
     private static Path released, archive, cnc, source;
+    private static boolean releaseDrawing, archiveDrawing, clearCNC;
 
     static Path getSaveFile() {
         return saveFile;
@@ -38,8 +39,8 @@ public class ReleaseUtility {
         return released;
     }
 
-    static void setReleased(Path path) {
-        released = path;
+    static void setReleased(Path released) {
+        ReleaseUtility.released = released;
     }
 
     static Path getArchive() {
