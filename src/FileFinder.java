@@ -1,7 +1,8 @@
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * FileFinder is used to walk a file tree, match file paths to a string, and add them to a HashSet that can be used
@@ -12,7 +13,7 @@ import java.util.HashSet;
 class FileFinder extends SimpleFileVisitor<Path> {
 
     private PathMatcher fileMatcher;
-    private HashSet<Path> result = new HashSet<>();
+    private List<DrawingFile> result = new ArrayList<>();
 
     FileFinder(String string) {
         this.setFileMatcher(string);
@@ -20,10 +21,9 @@ class FileFinder extends SimpleFileVisitor<Path> {
 
     @Override
     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-        System.out.println(file.toString());
-        System.out.println(fileMatcher.matches(file));
         if (fileMatcher.matches(file)) {
-            result.add(file);
+            result.add(new DrawingFile(file));
+            System.out.println("Added: " + file.getFileName());
             return FileVisitResult.CONTINUE;
         }
         return FileVisitResult.CONTINUE;
@@ -36,7 +36,7 @@ class FileFinder extends SimpleFileVisitor<Path> {
         return FileVisitResult.CONTINUE;
     }
 
-    HashSet<Path> getResult() {
+    List<DrawingFile> getResult() {
         return result;
     }
 

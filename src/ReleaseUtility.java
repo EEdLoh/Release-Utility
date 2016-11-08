@@ -22,14 +22,13 @@ import static java.nio.file.Files.newBufferedReader;
  * <p>
  * Created by elohmar on 8/23/2016.
  */
-public class ReleaseUtility {
+class ReleaseUtility {
 
     private static final Path saveFile =
             FileSystemView.getFileSystemView().getHomeDirectory()
                     .toPath().resolve("..\\Documents\\Release Utility Directories.txt").normalize();
     private static final JFileChooser fc = new JFileChooser();
     private static Path released, archive, cnc, source;
-    private static boolean releaseDrawing, archiveDrawing, clearCNC;
 
     static Path getSaveFile() {
         return saveFile;
