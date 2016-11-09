@@ -1,10 +1,11 @@
 import javax.swing.*;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 /**
@@ -16,11 +17,10 @@ import java.util.ArrayList;
  */
 class MainScreen extends JPanel implements ActionListener {
 
-    private static JCheckBox clearCNCBox, releaseDrawingBox, archiveDrawingBox;
+    private JCheckBox clearCNCBox, releaseDrawingBox, archiveDrawingBox;
     private JTextField partNoText, sourceText;
     private JButton sourceButton, settingsButton, findButton, testButton;
     private JTable sourceTable, releasedTable, archiveTable, cncTable;
-    private FileListTableModel sourceModel, releasedModel, archiveModel, cncModel;
 
     MainScreen() {
 
@@ -53,25 +53,29 @@ class MainScreen extends JPanel implements ActionListener {
         //File List Boxes and Container
         JPanel tableContainer = new JPanel();
 
-        sourceModel = new FileListTableModel(new ArrayList<>());
-        sourceTable = new JTable(sourceModel);
+        JLabel sourceTableLabel = new JLabel("Source");
+        sourceTable = new JTable(new FileListTableModel(new ArrayList<>()));
         sourceTable.setFillsViewportHeight(true);
         JScrollPane sourceScrollPane = new JScrollPane(sourceTable);
+        initColumnSizes(sourceTable);
 
-        releasedModel = new FileListTableModel(new ArrayList<>());
-        releasedTable = new JTable(releasedModel);
+        JLabel releasedTableLabel = new JLabel("Drawings Released");
+        releasedTable = new JTable(new FileListTableModel(new ArrayList<>()));
         releasedTable.setFillsViewportHeight(true);
         JScrollPane releasedScrollPane = new JScrollPane(releasedTable);
+        initColumnSizes(releasedTable);
 
-        archiveModel = new FileListTableModel(new ArrayList<>());
-        archiveTable = new JTable(archiveModel);
+        JLabel archiveTableLabel = new JLabel("Drawings Archive");
+        archiveTable = new JTable(new FileListTableModel(new ArrayList<>()));
         archiveTable.setFillsViewportHeight(true);
         JScrollPane archiveScrollPane = new JScrollPane(archiveTable);
+        initColumnSizes(archiveTable);
 
-        cncModel = new FileListTableModel(new ArrayList<>());
-        cncTable = new JTable(cncModel);
+        JLabel cncTableLabel = new JLabel("CNC");
+        cncTable = new JTable(new FileListTableModel(new ArrayList<>()));
         cncTable.setFillsViewportHeight(true);
         JScrollPane cncScrollPane = new JScrollPane(cncTable);
+        initColumnSizes(cncTable);
 
         tableContainer.setLayout(new GridBagLayout());
         GridBagConstraints gcon1 = new GridBagConstraints();
@@ -80,23 +84,45 @@ class MainScreen extends JPanel implements ActionListener {
         gcon1.anchor = GridBagConstraints.LINE_START;
         gcon1.fill = GridBagConstraints.BOTH;
         gcon1.gridx = 0;
-        gcon1.gridy = 0;
+        gcon1.gridy = 1;
         gcon1.weightx = 1;
         gcon1.weighty = 1;
         tableContainer.add(sourceScrollPane, gcon1);
 
         gcon1.gridx = 0;
-        gcon1.gridy = 1;
-        tableContainer.add(releasedScrollPane, gcon1);
+        gcon1.gridy = 3;
+        tableContainer.add(archiveScrollPane, gcon1);
 
         gcon1.anchor = GridBagConstraints.LINE_END;
         gcon1.gridx = 1;
-        gcon1.gridy = 0;
-        tableContainer.add(cncScrollPane, gcon1);
+        gcon1.gridy = 1;
+        tableContainer.add(releasedScrollPane, gcon1);
 
         gcon1.gridx = 1;
-        gcon1.gridy = 1;
-        tableContainer.add(archiveScrollPane, gcon1);
+        gcon1.gridy = 3;
+        tableContainer.add(cncScrollPane, gcon1);
+
+        gcon1.fill = GridBagConstraints.NONE;
+        gcon1.anchor = GridBagConstraints.LAST_LINE_START;
+        gcon1.gridx = 0;
+        gcon1.gridy = 0;
+        gcon1.weighty = .1;
+        tableContainer.add(sourceTableLabel, gcon1);
+
+        gcon1.insets.set(15, 0, 0, 0);
+        gcon1.gridx = 0;
+        gcon1.gridy = 2;
+        tableContainer.add(archiveTableLabel, gcon1);
+
+        gcon1.insets.set(0, 0, 0, 0);
+        gcon1.gridx = 1;
+        gcon1.gridy = 0;
+        tableContainer.add(releasedTableLabel, gcon1);
+
+        gcon1.insets.set(15, 0, 0, 0);
+        gcon1.gridx = 1;
+        gcon1.gridy = 2;
+        tableContainer.add(cncTableLabel, gcon1);
 
         ////// Layout //////
 
@@ -184,6 +210,36 @@ class MainScreen extends JPanel implements ActionListener {
         add(testButton, gc);
     }
 
+    static void initColumnSizes(JTable table) {
+        FileListTableModel model = (FileListTableModel) table.getModel();
+        TableColumn column;
+        Component comp;
+        int headerWidth;
+        int cellWidth;
+        Object[] longValues = FileListTableModel.longValues;
+        TableCellRenderer headerRenderer =
+                table.getTableHeader().getDefaultRenderer();
+
+        for (int i = 0; i < 3; i++) {
+            column = table.getColumnModel().getColumn(i);
+
+            comp = headerRenderer.getTableCellRendererComponent(
+                    null, column.getHeaderValue(),
+                    false, false, 0, 0);
+            headerWidth = comp.getPreferredSize().width;
+
+            comp = table.getDefaultRenderer(model.getColumnClass(i)).
+                    getTableCellRendererComponent(
+                            table, longValues[i],
+                            false, false, 0, i);
+            cellWidth = comp.getPreferredSize().width;
+
+            if (i == 0 || i == 2) {
+                column.setPreferredWidth(Math.max(headerWidth + 6, cellWidth + 6));
+            } else column.setPreferredWidth(Math.max(headerWidth, cellWidth));
+        }
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == settingsButton) {
@@ -191,22 +247,13 @@ class MainScreen extends JPanel implements ActionListener {
             folderEntry.setVisible(true);
 
         } else if (e.getSource() == findButton) {
-            if (!partNoText.getText().equals("") && !ReleaseUtility.getSource().toString().equals("")) {
-                System.out.println("Testing");
-                String pnMatch = "glob:**" + partNoText.getText() + "[, ]*";
-                System.out.println("Looking For: " + partNoText.getText());
+            ReleaseUtility.setPn(partNoText.getText());
+            ReleaseUtility.setSource(Paths.get(sourceText.getText()));
 
-                FileFinder fileFinder = new FileFinder(pnMatch);
-                try {
-                    Files.walkFileTree(ReleaseUtility.getSource(), fileFinder);
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-                for (DrawingFile file : fileFinder.getResult()) {
-                    System.out.println(file.toString());
-                }
-                sourceModel.setData(fileFinder.getResult());
-            }
+            (new Thread(new TableUpdate(sourceTable, ReleaseUtility.getSource()))).start();
+            (new Thread(new TableUpdate(releasedTable, ReleaseUtility.getReleased()))).start();
+            (new Thread(new TableUpdate(archiveTable, ReleaseUtility.getArchive()))).start();
+            (new Thread(new TableUpdate(cncTable, ReleaseUtility.getCnc()))).start();
         } else if (e.getSource() == sourceButton) {
             int returnVal = ReleaseUtility.getFc().showOpenDialog(this);
             if (returnVal == JFileChooser.APPROVE_OPTION) {

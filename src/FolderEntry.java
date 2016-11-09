@@ -124,15 +124,15 @@ class FolderEntry extends JDialog implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == saveButton) {
             try (BufferedWriter writer = Files.newBufferedWriter(ReleaseUtility.getSaveFile())) {
-                writer.write(releasedText.getText());
+                writer.write(ReleaseUtility.getReleasedString() + releasedText.getText());
                 ReleaseUtility.setReleased(Paths.get(releasedText.getText()));
                 writer.newLine();
 
-                writer.write(archiveText.getText());
+                writer.write(ReleaseUtility.getArchiveString() + archiveText.getText());
                 ReleaseUtility.setArchive(Paths.get(archiveText.getText()));
                 writer.newLine();
 
-                writer.write(cncText.getText());
+                writer.write(ReleaseUtility.getCncString() + cncText.getText());
                 ReleaseUtility.setCnc(Paths.get(cncText.getText()));
                 writer.newLine();
 

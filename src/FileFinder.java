@@ -23,7 +23,6 @@ class FileFinder extends SimpleFileVisitor<Path> {
     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
         if (fileMatcher.matches(file)) {
             result.add(new DrawingFile(file));
-            System.out.println("Added: " + file.getFileName());
             return FileVisitResult.CONTINUE;
         }
         return FileVisitResult.CONTINUE;

@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static java.nio.file.Files.newBufferedReader;
 
@@ -28,7 +30,30 @@ class ReleaseUtility {
             FileSystemView.getFileSystemView().getHomeDirectory()
                     .toPath().resolve("..\\Documents\\Release Utility Directories.txt").normalize();
     private static final JFileChooser fc = new JFileChooser();
+    private static final String releasedString = "released: ", archiveString = "archive: ", cncString = "cnc: ";
     private static Path released, archive, cnc, source;
+
+    private static String pn;
+
+    static String getPn() {
+        return pn;
+    }
+
+    static void setPn(String pn) {
+        ReleaseUtility.pn = pn;
+    }
+
+    static String getReleasedString() {
+        return releasedString;
+    }
+
+    static String getArchiveString() {
+        return archiveString;
+    }
+
+    static String getCncString() {
+        return cncString;
+    }
 
     static Path getSaveFile() {
         return saveFile;
@@ -87,10 +112,25 @@ class ReleaseUtility {
         fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 
         if (Files.exists(ReleaseUtility.saveFile)) {
+            Pattern releasedPattern = Pattern.compile(releasedString + ".*");
+            Pattern archivePattern = Pattern.compile(archiveString + ".*");
+            Pattern cncPattern = Pattern.compile(cncString + ".*");
+
             try (BufferedReader reader = newBufferedReader(ReleaseUtility.saveFile)) {
-                released = Paths.get(reader.readLine());
-                archive = Paths.get(reader.readLine());
-                cnc = Paths.get(reader.readLine());
+                String l;
+                while ((l = reader.readLine()) != null) {
+                    Matcher releasedMatcher = releasedPattern.matcher(l);
+                    Matcher archiveMatcher = archivePattern.matcher(l);
+                    Matcher cncMatcher = cncPattern.matcher(l);
+
+                    if (releasedMatcher.matches()) {
+                        setReleased(Paths.get(l.substring(releasedString.length())));
+                    } else if (archiveMatcher.matches()) {
+                        setArchive(Paths.get(l.substring(archiveString.length())));
+                    } else if (cncMatcher.matches()) {
+                        setCnc(Paths.get(l.substring(cncString.length())));
+                    }
+                }
             } catch (FileNotFoundException f) {
                 System.out.println("File Not Found");
                 f.printStackTrace();
