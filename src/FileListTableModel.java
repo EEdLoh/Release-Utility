@@ -9,11 +9,11 @@ import java.util.List;
  */
 class FileListTableModel extends AbstractTableModel {
 
-    public static final Object[] longValues = {true, "12345 A, 18GA 304, DPT, 7-27-16 - Copy", ".PDF"};
+    static final Object[] longValues = {true, "12345 A, 18GA 304, DPT, 7-27-16 - Copy", ".PDF"};
     private static final String[] columnNames = {"", "File Name", "ext"};
     private List<DrawingFile> data;
 
-    public FileListTableModel(List<DrawingFile> fileList) {
+    FileListTableModel(List<DrawingFile> fileList) {
         data = new ArrayList<>();
         data.clear();
         data.addAll(fileList);
@@ -61,13 +61,8 @@ class FileListTableModel extends AbstractTableModel {
     @Override
     public Class getColumnClass(int c) {
         if (c == 0) {
-            return new Boolean(true).getClass();
-        } else return new String("").getClass();
-    }
-
-    public void setData(List<DrawingFile> list) {
-        data = list;
-        fireTableDataChanged();
+            return Boolean.class;
+        } else return String.class;
     }
 
     public String toString() {

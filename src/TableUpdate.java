@@ -9,12 +9,12 @@ import java.nio.file.Path;
  * <p>
  * Created by elohmar on 11/9/2016.
  */
-public class TableUpdate implements Runnable {
+class TableUpdate implements Runnable {
 
     private JTable table;
     private Path path;
 
-    public TableUpdate(JTable table, Path path) {
+    TableUpdate(JTable table, Path path) {
         this.table = table;
         this.path = path;
     }

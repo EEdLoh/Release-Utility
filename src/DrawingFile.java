@@ -11,15 +11,18 @@ class DrawingFile {
     private boolean actionable;
     private Path filePath;
 
-    public DrawingFile(Path path) {
-        changePath(path);
+    DrawingFile(Path path) {
+        setFilePath(path);
+        setFileName(stripExtension(path));
+        setFileType(getExtension(path));
+        setActionable(true);
     }
 
     String getFileName() {
         return fileName;
     }
 
-    void setFileName(String fileName) {
+    private void setFileName(String fileName) {
         this.fileName = fileName;
     }
 
@@ -43,15 +46,8 @@ class DrawingFile {
         return filePath;
     }
 
-    void setFilePath(Path filePath) {
+    private void setFilePath(Path filePath) {
         this.filePath = filePath;
-    }
-
-    void changePath(Path path) {
-        setFilePath(path);
-        setFileName(stripExtension(path));
-        setFileType(getExtension(path));
-        setActionable(true);
     }
 
     private String stripExtension(Path path) {
