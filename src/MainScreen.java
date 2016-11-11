@@ -17,7 +17,7 @@ import java.util.ArrayList;
  */
 class MainScreen extends JPanel implements ActionListener {
 
-    private JCheckBox clearCNCBox, releaseDrawingBox, archiveDrawingBox;
+    private JCheckBox clearCNCBox, releaseDrawingBox, archiveDrawingBox, releaseCNCBox;
     private JTextField partNoText, sourceText;
     private JButton sourceButton, settingsButton, findButton, testButton;
     private JTable sourceTable, releasedTable, archiveTable, cncTable;
@@ -45,6 +45,7 @@ class MainScreen extends JPanel implements ActionListener {
         releaseDrawingBox = new JCheckBox("Release Drawings", true);
         archiveDrawingBox = new JCheckBox("Archive Drawings", true);
         clearCNCBox = new JCheckBox("Clear CNC Folder", true);
+        releaseCNCBox = new JCheckBox("Release DXF Files", true);
 
         //Test Button
         testButton = new JButton("Test");
@@ -171,10 +172,6 @@ class MainScreen extends JPanel implements ActionListener {
         gc.gridy = 5;
         add(archiveDrawingBox, gc);
 
-        gc.gridx = 0;
-        gc.gridy = 6;
-        add(clearCNCBox, gc);
-
         ////// Column 2 //////
         // gc.anchor = GridBagConstraints.CENTER;
         gc.weightx = 1;
@@ -184,6 +181,14 @@ class MainScreen extends JPanel implements ActionListener {
         gc.gridy = 1;
         gc.fill = GridBagConstraints.NONE;
         add(findButton, gc);
+
+        gc.gridx = 1;
+        gc.gridy = 4;
+        add(releaseCNCBox, gc);
+
+        gc.gridx = 1;
+        gc.gridy = 5;
+        add(clearCNCBox, gc);
 
         ////// Column 3 //////
         gc.anchor = GridBagConstraints.FIRST_LINE_START;
@@ -201,12 +206,12 @@ class MainScreen extends JPanel implements ActionListener {
         gc.gridwidth = GridBagConstraints.REMAINDER;
         gc.weighty = 1;
         gc.gridx = 0;
-        gc.gridy = 7;
+        gc.gridy = 8;
         add(tableContainer, gc);
 
         gc.fill = GridBagConstraints.NONE;
         gc.gridwidth = 1;
-        gc.gridy = 8;
+        gc.gridy = 9;
         add(testButton, gc);
     }
 
@@ -262,7 +267,32 @@ class MainScreen extends JPanel implements ActionListener {
                 sourceText.setText(path.toString());
             }
         } else if (e.getSource() == testButton) {
-            System.out.println(sourceTable.getModel());
+            if (releaseDrawingBox.isSelected()) {
+                System.out.println("Drawings to Release");
+
+                FileListTableModel releasedModel = (FileListTableModel) sourceTable.getModel();
+                releasedModel.getData().stream().filter(DrawingFile::isActionable).forEach(System.out::println);
+
+                System.out.println();
+            }
+
+            if (archiveDrawingBox.isSelected()) {
+                System.out.println("Drawings to Archive");
+
+                FileListTableModel archiveModel = (FileListTableModel) releasedTable.getModel();
+                archiveModel.getData().stream().filter(DrawingFile::isActionable).forEach(System.out::println);
+
+                System.out.println();
+            }
+
+            if (clearCNCBox.isSelected()) {
+                System.out.println("Files in the CNC folder");
+
+                FileListTableModel cncModel = (FileListTableModel) cncTable.getModel();
+                cncModel.getData().stream().filter(DrawingFile::isActionable).forEach(System.out::println);
+
+                System.out.println();
+            }
         }
     }
 }

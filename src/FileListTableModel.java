@@ -20,6 +20,10 @@ class FileListTableModel extends AbstractTableModel {
         fireTableDataChanged();
     }
 
+    public List<DrawingFile> getData() {
+        return data;
+    }
+
     public String getColumnName(int col) {
         return columnNames[col];
     }
