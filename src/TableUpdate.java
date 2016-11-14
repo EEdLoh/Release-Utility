@@ -13,16 +13,16 @@ class TableUpdate implements Runnable {
 
     private JTable table;
     private Path path;
+    private String pnMatch;
 
-    TableUpdate(JTable table, Path path) {
+    TableUpdate(JTable table, Path path, String pnMatch) {
         this.table = table;
         this.path = path;
+        this.pnMatch = pnMatch;
     }
 
     @Override
     public void run() {
-        String pnMatch = "glob:**" + ReleaseUtility.getPn() + "[, ]*";
-
         FileFinder fileFinder = new FileFinder(pnMatch);
         try {
             Files.walkFileTree(path, fileFinder);
