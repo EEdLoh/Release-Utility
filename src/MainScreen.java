@@ -4,9 +4,13 @@ import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 /**
  * MainScreen sets the GUI for the main screen of this application.
@@ -17,10 +21,10 @@ import java.util.ArrayList;
  */
 class MainScreen extends JPanel implements ActionListener {
 
-    private JCheckBox clearCNCBox, releaseDrawingBox, archiveDrawingBox, releaseCNCBox;
+    private JCheckBox releaseDrawingBox, releaseCNCBox;
     private JTextField partNoText, sourceText;
-    private JButton sourceButton, settingsButton, findButton, testButton;
-    private JTable sourceTable, releasedTable, archiveTable, cncTable;
+    private JButton sourceButton, settingsButton, findButton, goButton;
+    private JTable pdfFromSourceTable, releasedTable, dxfFromSourceTable, cncTable;
 
     MainScreen() {
 
@@ -43,36 +47,34 @@ class MainScreen extends JPanel implements ActionListener {
 
         //Check Box panel and Check Boxes Setup
         releaseDrawingBox = new JCheckBox("Release Drawings", true);
-        archiveDrawingBox = new JCheckBox("Archive Drawings", true);
-        clearCNCBox = new JCheckBox("Clear CNC Folder", true);
         releaseCNCBox = new JCheckBox("Release DXF Files", true);
 
         //Test Button
-        testButton = new JButton("Test");
-        testButton.addActionListener(this);
+        goButton = new JButton("Go");
+        goButton.addActionListener(this);
 
         //File List Boxes and Container
         JPanel tableContainer = new JPanel();
 
-        JLabel sourceTableLabel = new JLabel("Source");
-        sourceTable = new JTable(new FileListTableModel(new ArrayList<>()));
-        sourceTable.setFillsViewportHeight(true);
-        JScrollPane sourceScrollPane = new JScrollPane(sourceTable);
-        initColumnSizes(sourceTable);
+        JLabel sourceTableLabel = new JLabel("Drawings to Release");
+        pdfFromSourceTable = new JTable(new FileListTableModel(new ArrayList<>()));
+        pdfFromSourceTable.setFillsViewportHeight(true);
+        JScrollPane sourceScrollPane = new JScrollPane(pdfFromSourceTable);
+        initColumnSizes(pdfFromSourceTable);
 
-        JLabel releasedTableLabel = new JLabel("Drawings Released");
+        JLabel releasedTableLabel = new JLabel("Drawings to Archive");
         releasedTable = new JTable(new FileListTableModel(new ArrayList<>()));
         releasedTable.setFillsViewportHeight(true);
         JScrollPane releasedScrollPane = new JScrollPane(releasedTable);
         initColumnSizes(releasedTable);
 
-        JLabel archiveTableLabel = new JLabel("Drawings Archive");
-        archiveTable = new JTable(new FileListTableModel(new ArrayList<>()));
-        archiveTable.setFillsViewportHeight(true);
-        JScrollPane archiveScrollPane = new JScrollPane(archiveTable);
-        initColumnSizes(archiveTable);
+        JLabel archiveTableLabel = new JLabel("CNC Files to Release");
+        dxfFromSourceTable = new JTable(new FileListTableModel(new ArrayList<>()));
+        dxfFromSourceTable.setFillsViewportHeight(true);
+        JScrollPane archiveScrollPane = new JScrollPane(dxfFromSourceTable);
+        initColumnSizes(dxfFromSourceTable);
 
-        JLabel cncTableLabel = new JLabel("CNC");
+        JLabel cncTableLabel = new JLabel("CNC Files to Delete");
         cncTable = new JTable(new FileListTableModel(new ArrayList<>()));
         cncTable.setFillsViewportHeight(true);
         JScrollPane cncScrollPane = new JScrollPane(cncTable);
@@ -170,10 +172,9 @@ class MainScreen extends JPanel implements ActionListener {
 
         gc.gridx = 0;
         gc.gridy = 5;
-        add(archiveDrawingBox, gc);
+        add(releaseCNCBox, gc);
 
         ////// Column 2 //////
-        // gc.anchor = GridBagConstraints.CENTER;
         gc.weightx = 1;
         gc.insets.set(0, 0, 0, 0);
         gc.gridwidth = 1;
@@ -181,14 +182,6 @@ class MainScreen extends JPanel implements ActionListener {
         gc.gridy = 1;
         gc.fill = GridBagConstraints.NONE;
         add(findButton, gc);
-
-        gc.gridx = 1;
-        gc.gridy = 4;
-        add(releaseCNCBox, gc);
-
-        gc.gridx = 1;
-        gc.gridy = 5;
-        add(clearCNCBox, gc);
 
         ////// Column 3 //////
         gc.anchor = GridBagConstraints.FIRST_LINE_START;
@@ -209,10 +202,11 @@ class MainScreen extends JPanel implements ActionListener {
         gc.gridy = 8;
         add(tableContainer, gc);
 
+        gc.insets.set(0, 15, 15, 0);
         gc.fill = GridBagConstraints.NONE;
         gc.gridwidth = 1;
         gc.gridy = 9;
-        add(testButton, gc);
+        add(goButton, gc);
     }
 
     static void initColumnSizes(JTable table) {
@@ -255,10 +249,18 @@ class MainScreen extends JPanel implements ActionListener {
             ReleaseUtility.setPn(partNoText.getText());
             ReleaseUtility.setSource(Paths.get(sourceText.getText()));
 
-            (new Thread(new TableUpdate(sourceTable, ReleaseUtility.getSource()))).start();
-            (new Thread(new TableUpdate(releasedTable, ReleaseUtility.getReleased()))).start();
-            (new Thread(new TableUpdate(archiveTable, ReleaseUtility.getArchive()))).start();
-            (new Thread(new TableUpdate(cncTable, ReleaseUtility.getCnc()))).start();
+            (new Thread(new TableUpdate(pdfFromSourceTable, ReleaseUtility.getSource(),
+                    "glob:**" + ReleaseUtility.getPn() + "[, ]*.pdf"))).start();
+
+            (new Thread(new TableUpdate(dxfFromSourceTable, ReleaseUtility.getSource(),
+                    "glob:**" + ReleaseUtility.getPn() + "[, ]*.dxf"))).start();
+
+            (new Thread(new TableUpdate(releasedTable, ReleaseUtility.getReleased(),
+                    "glob:**" + ReleaseUtility.getPn() + "[, ]*"))).start();
+
+            (new Thread(new TableUpdate(cncTable, ReleaseUtility.getCnc(),
+                    "glob:**" + ReleaseUtility.getPn() + "[, ]*"))).start();
+
         } else if (e.getSource() == sourceButton) {
             int returnVal = ReleaseUtility.getFc().showOpenDialog(this);
             if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -266,32 +268,78 @@ class MainScreen extends JPanel implements ActionListener {
                 ReleaseUtility.setSource(path);
                 sourceText.setText(path.toString());
             }
-        } else if (e.getSource() == testButton) {
+        } else if (e.getSource() == goButton) {
             if (releaseDrawingBox.isSelected()) {
-                System.out.println("Drawings to Release");
 
-                FileListTableModel releasedModel = (FileListTableModel) sourceTable.getModel();
-                releasedModel.getData().stream().filter(DrawingFile::isActionable).forEach(System.out::println);
+                new Thread() {
+                    public void run() {
 
-                System.out.println();
+                        FileListTableModel toArchiveModel = (FileListTableModel) releasedTable.getModel();
+                        toArchiveModel.getData().stream().filter(DrawingFile::isActionable).forEach(file -> {
+                            try {
+                                Files.move(file.getFilePath(),
+                                        (ReleaseUtility.getArchive().resolve(file.getFilePath().getFileName())),
+                                        REPLACE_EXISTING);
+
+                            } catch (IOException e1) {
+                                e1.printStackTrace();
+                            }
+                        });
+
+                        (new Thread(new TableUpdate(releasedTable, ReleaseUtility.getReleased(),
+                                "glob:**" + ReleaseUtility.getPn() + "[, ]*"))).start();
+
+                        FileListTableModel toReleasedModel = (FileListTableModel) pdfFromSourceTable.getModel();
+                        toReleasedModel.getData().stream().filter(DrawingFile::isActionable).forEach(file -> {
+                            try {
+                                Files.move(file.getFilePath(),
+                                        (ReleaseUtility.getReleased().resolve(file.getFilePath().getFileName())),
+                                        REPLACE_EXISTING);
+
+                            } catch (IOException e1) {
+                                e1.printStackTrace();
+                            }
+                        });
+
+                        (new Thread(new TableUpdate(pdfFromSourceTable, ReleaseUtility.getSource(),
+                                "glob:**" + ReleaseUtility.getPn() + "[, ]*.pdf"))).start();
+                    }
+                }.start();
             }
 
-            if (archiveDrawingBox.isSelected()) {
-                System.out.println("Drawings to Archive");
+            if (releaseCNCBox.isSelected()) {
 
-                FileListTableModel archiveModel = (FileListTableModel) releasedTable.getModel();
-                archiveModel.getData().stream().filter(DrawingFile::isActionable).forEach(System.out::println);
+                new Thread() {
+                    public void run() {
 
-                System.out.println();
-            }
+                        FileListTableModel cncModel = (FileListTableModel) cncTable.getModel();
+                        cncModel.getData().stream().filter(DrawingFile::isActionable).forEach(file -> {
+                            try {
+                                Files.delete(file.getFilePath());
 
-            if (clearCNCBox.isSelected()) {
-                System.out.println("Files in the CNC folder");
+                            } catch (IOException e1) {
+                                e1.printStackTrace();
+                            }
+                        });
 
-                FileListTableModel cncModel = (FileListTableModel) cncTable.getModel();
-                cncModel.getData().stream().filter(DrawingFile::isActionable).forEach(System.out::println);
+                        (new Thread(new TableUpdate(cncTable, ReleaseUtility.getCnc(),
+                                "glob:**" + ReleaseUtility.getPn() + "[, ]*"))).start();
 
-                System.out.println();
+                        FileListTableModel toCNCModel = (FileListTableModel) dxfFromSourceTable.getModel();
+                        toCNCModel.getData().stream().filter(DrawingFile::isActionable).forEach(file -> {
+                            Path dest = Paths.get(ReleaseUtility.getCnc() + "\\DXFs\\" + file.getFilePath().getFileName());
+                            try {
+                                Files.move(file.getFilePath(), dest, REPLACE_EXISTING);
+
+                            } catch (IOException e1) {
+                                e1.printStackTrace();
+                            }
+                        });
+
+                        (new Thread(new TableUpdate(dxfFromSourceTable, ReleaseUtility.getSource(),
+                                "glob:**" + ReleaseUtility.getPn() + "[, ]*.dxf"))).start();
+                    }
+                }.start();
             }
         }
     }
