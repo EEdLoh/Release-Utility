@@ -61,24 +61,28 @@ class MainScreen extends JPanel implements ActionListener {
         pdfFromSourceTable.setFillsViewportHeight(true);
         JScrollPane sourceScrollPane = new JScrollPane(pdfFromSourceTable);
         initColumnSizes(pdfFromSourceTable);
+        pdfFromSourceTable.setAutoCreateRowSorter(true);
 
         JLabel releasedTableLabel = new JLabel("Drawings to Archive");
         releasedTable = new JTable(new FileListTableModel(new ArrayList<>()));
         releasedTable.setFillsViewportHeight(true);
         JScrollPane releasedScrollPane = new JScrollPane(releasedTable);
         initColumnSizes(releasedTable);
+        releasedTable.setAutoCreateRowSorter(true);
 
         JLabel archiveTableLabel = new JLabel("CNC Files to Release");
         dxfFromSourceTable = new JTable(new FileListTableModel(new ArrayList<>()));
         dxfFromSourceTable.setFillsViewportHeight(true);
         JScrollPane archiveScrollPane = new JScrollPane(dxfFromSourceTable);
         initColumnSizes(dxfFromSourceTable);
+        dxfFromSourceTable.setAutoCreateRowSorter(true);
 
         JLabel cncTableLabel = new JLabel("CNC Files to Delete");
         cncTable = new JTable(new FileListTableModel(new ArrayList<>()));
         cncTable.setFillsViewportHeight(true);
         JScrollPane cncScrollPane = new JScrollPane(cncTable);
         initColumnSizes(cncTable);
+        cncTable.setAutoCreateRowSorter(true);
 
         tableContainer.setLayout(new GridBagLayout());
         GridBagConstraints gcon1 = new GridBagConstraints();
