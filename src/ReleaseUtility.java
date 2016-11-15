@@ -2,6 +2,7 @@ import javax.swing.*;
 import javax.swing.filechooser.FileSystemView;
 import java.awt.*;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -137,6 +138,23 @@ class ReleaseUtility {
             } catch (IOException e) {
                 System.out.println("IO Exception");
                 e.printStackTrace();
+            }
+        } else {
+            try (BufferedWriter writer = Files.newBufferedWriter(ReleaseUtility.getSaveFile())) {
+                writer.write(releasedString + "\\\\brain\\data\\Drawings Released");
+                ReleaseUtility.setReleased(Paths.get("\\\\brain\\data\\Drawings Released"));
+                writer.newLine();
+
+                writer.write(archiveString + "\\\\brain\\data\\Drawings Archive");
+                ReleaseUtility.setArchive(Paths.get("\\\\brain\\data\\Drawings Archive"));
+                writer.newLine();
+
+                writer.write(cncString + "\\\\brain\\data\\Velocity Metal Works\\CNC");
+                ReleaseUtility.setCnc(Paths.get("\\\\brain\\data\\Velocity Metal Works\\CNC"));
+                writer.newLine();
+
+            } catch (IOException e1) {
+                e1.printStackTrace();
             }
         }
 
