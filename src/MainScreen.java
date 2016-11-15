@@ -286,9 +286,6 @@ class MainScreen extends JPanel implements ActionListener {
                             }
                         });
 
-                        (new Thread(new TableUpdate(releasedTable, ReleaseUtility.getReleased(),
-                                "glob:**" + ReleaseUtility.getPn() + "[, ]*"))).start();
-
                         FileListTableModel toReleasedModel = (FileListTableModel) pdfFromSourceTable.getModel();
                         toReleasedModel.getData().stream().filter(DrawingFile::isActionable).forEach(file -> {
                             try {
@@ -300,6 +297,9 @@ class MainScreen extends JPanel implements ActionListener {
                                 e1.printStackTrace();
                             }
                         });
+
+                        (new Thread(new TableUpdate(releasedTable, ReleaseUtility.getReleased(),
+                                "glob:**" + ReleaseUtility.getPn() + "[, ]*"))).start();
 
                         (new Thread(new TableUpdate(pdfFromSourceTable, ReleaseUtility.getSource(),
                                 "glob:**" + ReleaseUtility.getPn() + "[, ]*.pdf"))).start();
@@ -322,8 +322,6 @@ class MainScreen extends JPanel implements ActionListener {
                             }
                         });
 
-                        (new Thread(new TableUpdate(cncTable, ReleaseUtility.getCnc(),
-                                "glob:**" + ReleaseUtility.getPn() + "[, ]*"))).start();
 
                         FileListTableModel toCNCModel = (FileListTableModel) dxfFromSourceTable.getModel();
                         toCNCModel.getData().stream().filter(DrawingFile::isActionable).forEach(file -> {
@@ -335,6 +333,9 @@ class MainScreen extends JPanel implements ActionListener {
                                 e1.printStackTrace();
                             }
                         });
+
+                        (new Thread(new TableUpdate(cncTable, ReleaseUtility.getCnc(),
+                                "glob:**" + ReleaseUtility.getPn() + "[, ]*"))).start();
 
                         (new Thread(new TableUpdate(dxfFromSourceTable, ReleaseUtility.getSource(),
                                 "glob:**" + ReleaseUtility.getPn() + "[, ]*.dxf"))).start();
