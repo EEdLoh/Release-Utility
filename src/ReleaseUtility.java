@@ -33,8 +33,12 @@ class ReleaseUtility {
     private static final JFileChooser fc = new JFileChooser();
     private static final String releasedString = "released: ", archiveString = "archive: ", cncString = "cnc: ";
     private static Path released, archive, cnc, source;
-
+    private static JFrame frame = new JFrame("Release Assistant");
     private static String pn;
+
+    public static JFrame getFrame() {
+        return frame;
+    }
 
     static String getPn() {
         return pn;
@@ -97,7 +101,6 @@ class ReleaseUtility {
     }
 
     private static void createAndShowGUI() {
-        JFrame frame = new JFrame("Release Assistant");
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         Dimension minSize = new Dimension(600, 220);
         frame.setMinimumSize(minSize);

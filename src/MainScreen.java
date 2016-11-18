@@ -275,76 +275,112 @@ class MainScreen extends JPanel implements ActionListener {
         } else if (e.getSource() == goButton) {
             if (releaseDrawingBox.isSelected()) {
 
-                new Thread() {
-                    public void run() {
+                Object[] options = {"Yes", "No"};
+                int i = JOptionPane.showOptionDialog(this, "Any checked Files in the \"Drawings to Archive\" list" +
+                                " will be moved from Drawings Released to Drawings Archive. \nIs this OK?",
+                        "Archiving Drawings",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.WARNING_MESSAGE,
+                        null,
+                        options,
+                        options[0]);
 
-                        FileListTableModel toArchiveModel = (FileListTableModel) releasedTable.getModel();
-                        toArchiveModel.getData().stream().filter(DrawingFile::isActionable).forEach(file -> {
-                            try {
-                                Files.move(file.getFilePath(),
-                                        (ReleaseUtility.getArchive().resolve(file.getFilePath().getFileName())),
-                                        REPLACE_EXISTING);
+                if (i == JOptionPane.OK_OPTION) {
+                    new Thread() {
+                        public void run() {
 
-                            } catch (IOException e1) {
-                                e1.printStackTrace();
+                            FileListTableModel toArchiveModel = (FileListTableModel) releasedTable.getModel();
+
+                            if (toArchiveModel.getData().size() > 0) {
+                                toArchiveModel.getData().stream().filter(DrawingFile::isActionable).forEach(file -> {
+                                    try {
+                                        Files.move(file.getFilePath(),
+                                                (ReleaseUtility.getArchive().resolve(file.getFilePath().getFileName())),
+                                                REPLACE_EXISTING);
+
+                                    } catch (IOException e1) {
+                                        e1.printStackTrace();
+                                    }
+                                });
                             }
-                        });
 
-                        FileListTableModel toReleasedModel = (FileListTableModel) pdfFromSourceTable.getModel();
-                        toReleasedModel.getData().stream().filter(DrawingFile::isActionable).forEach(file -> {
-                            try {
-                                Files.move(file.getFilePath(),
-                                        (ReleaseUtility.getReleased().resolve(file.getFilePath().getFileName())),
-                                        REPLACE_EXISTING);
+                            FileListTableModel toReleasedModel = (FileListTableModel) pdfFromSourceTable.getModel();
 
-                            } catch (IOException e1) {
-                                e1.printStackTrace();
+                            if (toReleasedModel.getData().size() > 0) {
+                                toReleasedModel.getData().stream().filter(DrawingFile::isActionable).forEach(file -> {
+                                    try {
+                                        Files.move(file.getFilePath(),
+                                                (ReleaseUtility.getReleased().resolve(file.getFilePath().getFileName())),
+                                                REPLACE_EXISTING);
+
+                                    } catch (IOException e1) {
+                                        e1.printStackTrace();
+                                    }
+                                });
                             }
-                        });
 
-                        (new Thread(new TableUpdate(releasedTable, ReleaseUtility.getReleased(),
-                                "glob:**" + ReleaseUtility.getPn() + "[, ]*"))).start();
+                            (new Thread(new TableUpdate(releasedTable, ReleaseUtility.getReleased(),
+                                    "glob:**" + ReleaseUtility.getPn() + "[, ]*"))).start();
 
-                        (new Thread(new TableUpdate(pdfFromSourceTable, ReleaseUtility.getSource(),
-                                "glob:**" + ReleaseUtility.getPn() + "[, ]*.pdf"))).start();
-                    }
-                }.start();
+                            (new Thread(new TableUpdate(pdfFromSourceTable, ReleaseUtility.getSource(),
+                                    "glob:**" + ReleaseUtility.getPn() + "[, ]*.pdf"))).start();
+                        }
+                    }.start();
+                }
             }
 
             if (releaseCNCBox.isSelected()) {
 
-                new Thread() {
-                    public void run() {
+                Object[] options = {"Yes", "No"};
+                int i = JOptionPane.showOptionDialog(this, "Any checked Files in the \"CNC Files to Delete\" will be " +
+                                "deleted. \nIs this OK?",
+                        "Archiving Drawings",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.WARNING_MESSAGE,
+                        null,
+                        options,
+                        options[0]);
 
-                        FileListTableModel cncModel = (FileListTableModel) cncTable.getModel();
-                        cncModel.getData().stream().filter(DrawingFile::isActionable).forEach(file -> {
-                            try {
-                                Files.delete(file.getFilePath());
+                if (i == JOptionPane.OK_OPTION) {
+                    new Thread() {
+                        public void run() {
 
-                            } catch (IOException e1) {
-                                e1.printStackTrace();
+                            FileListTableModel cncModel = (FileListTableModel) cncTable.getModel();
+
+                            if (cncModel.getData().size() > 0) {
+                                cncModel.getData().stream().filter(DrawingFile::isActionable).forEach(file -> {
+                                    try {
+                                        Files.delete(file.getFilePath());
+
+                                    } catch (IOException e1) {
+                                        e1.printStackTrace();
+                                    }
+                                });
                             }
-                        });
 
 
-                        FileListTableModel toCNCModel = (FileListTableModel) dxfFromSourceTable.getModel();
-                        toCNCModel.getData().stream().filter(DrawingFile::isActionable).forEach(file -> {
-                            Path dest = Paths.get(ReleaseUtility.getCnc() + "\\DXFs\\" + file.getFilePath().getFileName());
-                            try {
-                                Files.move(file.getFilePath(), dest, REPLACE_EXISTING);
+                            FileListTableModel toCNCModel = (FileListTableModel) dxfFromSourceTable.getModel();
 
-                            } catch (IOException e1) {
-                                e1.printStackTrace();
+                            if (toCNCModel.getData().size() > 0) {
+                                toCNCModel.getData().stream().filter(DrawingFile::isActionable).forEach(file -> {
+                                    Path dest = Paths.get(ReleaseUtility.getCnc() + "\\DXFs\\" + file.getFilePath().getFileName());
+                                    try {
+                                        Files.move(file.getFilePath(), dest, REPLACE_EXISTING);
+
+                                    } catch (IOException e1) {
+                                        e1.printStackTrace();
+                                    }
+                                });
                             }
-                        });
 
-                        (new Thread(new TableUpdate(cncTable, ReleaseUtility.getCnc(),
-                                "glob:**" + ReleaseUtility.getPn() + "[, ]*"))).start();
+                            (new Thread(new TableUpdate(cncTable, ReleaseUtility.getCnc(),
+                                    "glob:**" + ReleaseUtility.getPn() + "[, ]*"))).start();
 
-                        (new Thread(new TableUpdate(dxfFromSourceTable, ReleaseUtility.getSource(),
-                                "glob:**" + ReleaseUtility.getPn() + "[, ]*.dxf"))).start();
-                    }
-                }.start();
+                            (new Thread(new TableUpdate(dxfFromSourceTable, ReleaseUtility.getSource(),
+                                    "glob:**" + ReleaseUtility.getPn() + "[, ]*.dxf"))).start();
+                        }
+                    }.start();
+                }
             }
         }
     }
