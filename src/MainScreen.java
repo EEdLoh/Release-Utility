@@ -263,7 +263,7 @@ class MainScreen extends JPanel implements ActionListener {
                     "glob:**" + ReleaseUtility.getPn() + "[, ]*"))).start();
 
             (new Thread(new TableUpdate(cncTable, ReleaseUtility.getCnc(),
-                    "glob:**" + ReleaseUtility.getPn() + "*"))).start();
+                    "glob:**" + ReleaseUtility.getPn() + "{[, ],[a-z,A-Z]}*"))).start();
 
         } else if (e.getSource() == sourceButton) {
             int returnVal = ReleaseUtility.getFc().showOpenDialog(this);
@@ -374,7 +374,7 @@ class MainScreen extends JPanel implements ActionListener {
                             }
 
                             (new Thread(new TableUpdate(cncTable, ReleaseUtility.getCnc(),
-                                    "glob:**" + ReleaseUtility.getPn() + "*"))).start();
+                                    "glob:**" + ReleaseUtility.getPn() + "{[, ],[a-z,A-Z]}*"))).start();
 
                             (new Thread(new TableUpdate(dxfFromSourceTable, ReleaseUtility.getSource(),
                                     "glob:**" + ReleaseUtility.getPn() + "[, ]*.dxf"))).start();
