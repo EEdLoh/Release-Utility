@@ -10,7 +10,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
-import static java.nio.file.StandardCopyOption.ATOMIC_MOVE;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 /**
  * MainScreen sets the GUI for the main screen of this application.
@@ -295,7 +295,7 @@ class MainScreen extends JPanel implements ActionListener {
                                 try {
                                     Files.move(file.getFilePath(),
                                             (ReleaseUtility.getArchive().resolve(file.getFilePath().getFileName())),
-                                            ATOMIC_MOVE);
+                                            REPLACE_EXISTING);
 
                                 } catch (IOException e1) {
                                     e1.printStackTrace();
@@ -310,7 +310,7 @@ class MainScreen extends JPanel implements ActionListener {
                                 try {
                                     Files.move(file.getFilePath(),
                                             (ReleaseUtility.getReleased().resolve(file.getFilePath().getFileName())),
-                                            ATOMIC_MOVE);
+                                            REPLACE_EXISTING);
 
                                 } catch (IOException e1) {
                                     e1.printStackTrace();
@@ -362,7 +362,7 @@ class MainScreen extends JPanel implements ActionListener {
                             toCNCModel.getData().stream().filter(DrawingFile::isActionable).forEach(file -> {
                                 Path dest = Paths.get(ReleaseUtility.getCnc() + "\\DXFs\\" + file.getFilePath().getFileName());
                                 try {
-                                    Files.move(file.getFilePath(), dest, ATOMIC_MOVE);
+                                    Files.move(file.getFilePath(), dest, REPLACE_EXISTING);
 
                                 } catch (IOException e1) {
                                     e1.printStackTrace();
