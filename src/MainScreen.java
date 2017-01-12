@@ -325,6 +325,9 @@ class MainScreen extends JPanel implements ActionListener {
                         (new Thread(new TableUpdate(pdfFromSourceTable, ReleaseUtility.getSource(),
                                 "glob:**" + ReleaseUtility.getPn() + "[, ]*.pdf"))).start();
 
+                        JOptionPane.showMessageDialog(this, ("Paths for newly Released drawings:\n" + releasedPathList), "Released File Paths", JOptionPane.DEFAULT_OPTION);
+                        releasedPathList = "";
+
                     }).start();
                 }
             }
@@ -377,9 +380,6 @@ class MainScreen extends JPanel implements ActionListener {
 
                         (new Thread(new TableUpdate(dxfFromSourceTable, ReleaseUtility.getSource(),
                                 "glob:**" + ReleaseUtility.getPn() + "[, ]*.dxf"))).start();
-
-                        JOptionPane.showMessageDialog(this, ("Paths for newly Released drawings:\n" + releasedPathList), "Released File Paths", JOptionPane.DEFAULT_OPTION);
-                        releasedPathList = "";
 
                     }).start();
                 }
