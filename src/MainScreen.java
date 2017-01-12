@@ -21,6 +21,7 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
  */
 class MainScreen extends JPanel implements ActionListener {
 
+    private static String releasedPathList = "";
     private JCheckBox releaseDrawingBox, releaseCNCBox;
     private JTextField partNoText, sourceText;
     private JButton sourceButton, settingsButton, findButton, goButton;
@@ -246,8 +247,7 @@ class MainScreen extends JPanel implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == settingsButton) {
-            FolderEntry folderEntry = new FolderEntry("Settings", Dialog.ModalityType.APPLICATION_MODAL);
-            folderEntry.setVisible(true);
+            (new FolderEntry("Settings", Dialog.ModalityType.APPLICATION_MODAL)).setVisible(true);
 
         } else if (e.getSource() == findButton) {
             ReleaseUtility.setPn(partNoText.getText());
@@ -303,6 +303,7 @@ class MainScreen extends JPanel implements ActionListener {
                             });
                         }
 
+
                         FileListTableModel toReleasedModel = (FileListTableModel) pdfFromSourceTable.getModel();
 
                         if (toReleasedModel.getData().size() > 0) {
@@ -311,7 +312,7 @@ class MainScreen extends JPanel implements ActionListener {
                                     Files.move(file.getFilePath(),
                                             (ReleaseUtility.getReleased().resolve(file.getFilePath().getFileName())),
                                             REPLACE_EXISTING);
-
+                                    releasedPathList = releasedPathList + ReleaseUtility.getReleased().resolve(file.getFilePath().getFileName()).toString();
                                 } catch (IOException e1) {
                                     e1.printStackTrace();
                                 }
@@ -323,6 +324,7 @@ class MainScreen extends JPanel implements ActionListener {
 
                         (new Thread(new TableUpdate(pdfFromSourceTable, ReleaseUtility.getSource(),
                                 "glob:**" + ReleaseUtility.getPn() + "[, ]*.pdf"))).start();
+
                     }).start();
                 }
             }
@@ -375,6 +377,10 @@ class MainScreen extends JPanel implements ActionListener {
 
                         (new Thread(new TableUpdate(dxfFromSourceTable, ReleaseUtility.getSource(),
                                 "glob:**" + ReleaseUtility.getPn() + "[, ]*.dxf"))).start();
+
+                        JOptionPane.showMessageDialog(this, ("Paths for newly Released drawings:\n" + releasedPathList), "Released File Paths", JOptionPane.DEFAULT_OPTION);
+                        releasedPathList = "";
+
                     }).start();
                 }
             }
