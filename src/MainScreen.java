@@ -21,7 +21,7 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
  */
 class MainScreen extends JPanel implements ActionListener {
 
-    private static String releasedPathList = "";
+    private static ArrayList<String> releasedPathList = new ArrayList<>();
     private JCheckBox releaseDrawingBox, releaseCNCBox;
     private JTextField partNoText, sourceText;
     private JButton sourceButton, settingsButton, findButton, goButton;
@@ -273,11 +273,69 @@ class MainScreen extends JPanel implements ActionListener {
                 sourceText.setText(path.toString());
             }
         } else if (e.getSource() == goButton) {
+
+            if (releaseCNCBox.isSelected()) {
+
+                Object[] options = {"Yes", "No"};
+                int i = JOptionPane.showOptionDialog(this, "Any checked Files in the\n" +
+                                "\"CNC Files to Delete\"" +
+                                "\nwill be deleted." +
+                                "\nIs this OK?",
+                        "Archiving Drawings",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.WARNING_MESSAGE,
+                        null,
+                        options,
+                        options[0]);
+
+                if (i == JOptionPane.OK_OPTION) {
+                    new Thread(() -> {
+
+                        FileListTableModel cncModel = (FileListTableModel) cncTable.getModel();
+
+                        if (cncModel.getData().size() > 0) {
+                            cncModel.getData().stream().filter(DrawingFile::isActionable).forEach(file -> {
+                                try {
+                                    Files.delete(file.getFilePath());
+
+                                } catch (IOException e1) {
+                                    e1.printStackTrace();
+                                }
+                            });
+                        }
+
+                        FileListTableModel toCNCModel = (FileListTableModel) dxfFromSourceTable.getModel();
+
+                        if (toCNCModel.getData().size() > 0) {
+                            toCNCModel.getData().stream().filter(DrawingFile::isActionable).forEach(file -> {
+                                Path dest = Paths.get(ReleaseUtility.getCnc() + "\\DXFs\\" + file.getFilePath().getFileName());
+                                try {
+                                    Files.move(file.getFilePath(), dest, REPLACE_EXISTING);
+
+                                } catch (IOException e1) {
+                                    e1.printStackTrace();
+                                }
+                            });
+                        }
+
+                        (new Thread(new TableUpdate(cncTable, ReleaseUtility.getCnc(),
+                                "glob:**" + ReleaseUtility.getPn() + "{[, ],[a-z,A-Z]}*"))).start();
+
+                        (new Thread(new TableUpdate(dxfFromSourceTable, ReleaseUtility.getSource(),
+                                "glob:**" + ReleaseUtility.getPn() + "[, ]*.dxf"))).start();
+
+                    }).start();
+                }
+            }
+
             if (releaseDrawingBox.isSelected()) {
 
                 Object[] options = {"Yes", "No"};
-                int i = JOptionPane.showOptionDialog(this, "Any checked Files in the \"Drawings to Archive\" list" +
-                                " will be moved from Drawings Released to Drawings Archive. \nIs this OK?",
+                int i = JOptionPane.showOptionDialog(this, "Any checked Files in the" +
+                                "\n\"Drawings to Archive\" list" +
+                                " will be moved from Drawings Released\n" +
+                                "to Drawings Archive." +
+                                "\nIs this OK?",
                         "Archiving Drawings",
                         JOptionPane.YES_NO_OPTION,
                         JOptionPane.WARNING_MESSAGE,
@@ -312,75 +370,19 @@ class MainScreen extends JPanel implements ActionListener {
                                     Files.move(file.getFilePath(),
                                             (ReleaseUtility.getReleased().resolve(file.getFilePath().getFileName())),
                                             REPLACE_EXISTING);
-                                    releasedPathList = releasedPathList + ReleaseUtility.getReleased().resolve(file.getFilePath().getFileName()).toString();
+                                    releasedPathList.add(ReleaseUtility.getReleased().resolve(file.getFilePath().getFileName()).toString());
                                 } catch (IOException e1) {
                                     e1.printStackTrace();
                                 }
                             });
                         }
-
                         (new Thread(new TableUpdate(releasedTable, ReleaseUtility.getReleased(),
                                 "glob:**" + ReleaseUtility.getPn() + "[, ]*"))).start();
 
                         (new Thread(new TableUpdate(pdfFromSourceTable, ReleaseUtility.getSource(),
                                 "glob:**" + ReleaseUtility.getPn() + "[, ]*.pdf"))).start();
 
-                        JOptionPane.showMessageDialog(this, ("Paths for newly Released drawings:\n" + releasedPathList), "Released File Paths", JOptionPane.DEFAULT_OPTION);
-                        releasedPathList = "";
-
-                    }).start();
-                }
-            }
-
-            if (releaseCNCBox.isSelected()) {
-
-                Object[] options = {"Yes", "No"};
-                int i = JOptionPane.showOptionDialog(this, "Any checked Files in the \"CNC Files to Delete\" will be " +
-                                "deleted. \nIs this OK?",
-                        "Archiving Drawings",
-                        JOptionPane.YES_NO_OPTION,
-                        JOptionPane.WARNING_MESSAGE,
-                        null,
-                        options,
-                        options[0]);
-
-                if (i == JOptionPane.OK_OPTION) {
-                    new Thread(() -> {
-
-                        FileListTableModel cncModel = (FileListTableModel) cncTable.getModel();
-
-                        if (cncModel.getData().size() > 0) {
-                            cncModel.getData().stream().filter(DrawingFile::isActionable).forEach(file -> {
-                                try {
-                                    Files.delete(file.getFilePath());
-
-                                } catch (IOException e1) {
-                                    e1.printStackTrace();
-                                }
-                            });
-                        }
-
-
-                        FileListTableModel toCNCModel = (FileListTableModel) dxfFromSourceTable.getModel();
-
-                        if (toCNCModel.getData().size() > 0) {
-                            toCNCModel.getData().stream().filter(DrawingFile::isActionable).forEach(file -> {
-                                Path dest = Paths.get(ReleaseUtility.getCnc() + "\\DXFs\\" + file.getFilePath().getFileName());
-                                try {
-                                    Files.move(file.getFilePath(), dest, REPLACE_EXISTING);
-
-                                } catch (IOException e1) {
-                                    e1.printStackTrace();
-                                }
-                            });
-                        }
-
-                        (new Thread(new TableUpdate(cncTable, ReleaseUtility.getCnc(),
-                                "glob:**" + ReleaseUtility.getPn() + "{[, ],[a-z,A-Z]}*"))).start();
-
-                        (new Thread(new TableUpdate(dxfFromSourceTable, ReleaseUtility.getSource(),
-                                "glob:**" + ReleaseUtility.getPn() + "[, ]*.dxf"))).start();
-
+                        (new PathsDialog("Drawing Paths", Dialog.ModalityType.MODELESS, releasedPathList)).setVisible(true);
                     }).start();
                 }
             }
